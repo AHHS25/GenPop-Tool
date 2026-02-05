@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GenPop-Tool · Mileage Calculator</title>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:rgba(2,6,23,.10);
+      --purple:#6d28d9;
+      --lilac:#a78bfa;
+      --ok:#16a34a;
+      --warn:#d97706;
+      --bad:#dc2626;
+      --shadow:0 12px 30px rgba(2,6,23,.10);
+      --radius:18px;
+      --mono:ui-monospace, Menlo, Consolas, monospace;
+      --sans:system-ui, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(109,40,217,.18), transparent 55%),
+        radial-gradient(900px 650px at 80% 20%, rgba(167,139,250,.16), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      padding:28px;
+      color:var(--text);
+    }
+
+    .wrap{width:min(1100px,100%)}
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:16px;
+      align-items:flex-end;
+    }
+
+    h1{margin:0;font-size:26px; display:flex; align-items:baseline; gap:10px;}
+    .ver{
+      font-size:12px;
+      font-family: var(--mono);
+      color: rgba(15,23,42,.45);
+      letter-spacing:.6px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(2,6,23,.10);
+      background: rgba(255,255,255,.55);
+      backdrop-filter: blur(6px);
+    }
+
+    .today{
+      font-family:var(--mono);
+      font-size:13px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:white;
+      box-shadow:var(--shadow);
+    }
+
+    .btnClear{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(109,40,217,.28);
+      background:linear-gradient(180deg, rgba(109,40,217,.10), rgba(109,40,217,.04));
+      font-weight:800;
+      font-family: var(--mono);
+      font-size:12px;
+      cursor:pointer;
+      color:#3b0764;
+    }
+
+    .card{
+      background:rgba(255,255,255,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+
+    .top{
+      padding:18px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .box{
+      border:1px dashed rgba(109,40,217,.35);
+      border-radius:16px;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      background:rgba(255,255,255,.8);
+    }
+
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+
+    label{font-size:13px;color:var(--muted)}
+    input{
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      font-family:var(--mono);
+      font-size:14px;
+      background:white;
+      min-width:240px;
+    }
+
+    .btn{
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid rgba(109,40,217,.28);
+      background:linear-gradient(180deg, rgba(109,40,217,.12), rgba(109,40,217,.05));
+      font-weight:800;
+      cursor:pointer;
+      font-family:var(--mono);
+    }
+
+    .status{
+      display:none;
+      padding:12px;
+      border-radius:14px;
+      font-family:var(--mono);
+      font-size:13px;
+      border:1px solid;
+      background:white;
+    }
+    .status.ok{border-color:var(--ok); color:#065f46;}
+    .status.warn{border-color:var(--warn); color:#92400e;}
+    .status.bad{border-color:var(--bad); color:#7f1d1d;}
+
+    .results{padding:18px}
+
+    pre{
+      padding:16px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:white;
+      font-family:var(--mono);
+      font-size:15px;
+      font-weight:700;
+      text-align:center;
+    }
+
+    .footer{
+      margin-top: 22px;
+      padding: 14px 10px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(109,40,217,.75);
+      border-top: 1px solid rgba(109,40,217,.22);
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>GenPop-Tool <span class="ver">1.0
+      </span></h1>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="today" id="todayBox"></div>
+      <button class="btnClear" id="clearAllBtn">🧹 Clear All</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="top">
+      <div class="box">
+        <strong>Mileage Calculator</strong>
+
+        <div class="row">
+          <div>
+            <label>Starting mileage (at contract)</label><br/>
+            <input id="startMiles" placeholder="Ej: 42350" />
+          </div>
+
+          <div>
+            <label>Contract date (MM/DD/YYYY)</label><br/>
+            <input id="contractDate" type="date" />
+          </div>
+
+          <button class="btn" id="calcBtn">Calculate</button>
+        </div>
+
+        <div class="status" id="statusBox"></div>
+      </div>
+    </div>
+
+    <div class="results" id="results"></div>
+  </section>
+
+  <footer class="footer">
+    © <span id="year"></span> ASERRATO.MX · All rights reserved
+  </footer>
+
+</div>
+
+<script>
+  const today = new Date();
+  document.getElementById('todayBox').textContent =
+    `Today: ${today.getMonth()+1}/${today.getDate()}/${today.getFullYear()}`;
+  document.getElementById('year').textContent = today.getFullYear();
+
+  const startMilesEl = document.getElementById('startMiles');
+  const contractDateEl = document.getElementById('contractDate');
+  const results = document.getElementById('results');
+  const statusBox = document.getElementById('statusBox');
+
+  function showStatus(type,msg){
+    statusBox.className = `status ${type}`;
+    statusBox.style.display = 'block';
+    statusBox.textContent = msg;
+  }
+  function hideStatus(){ statusBox.style.display='none'; }
+
+  function monthsDiff(start, end){
+    let months = (end.getFullYear()-start.getFullYear())*12 +
+                 (end.getMonth()-start.getMonth());
+    if(end.getDate() < start.getDate()) months--;
+    return months;
+  }
+
+  function calcMileage(){
+    results.innerHTML='';
+    hideStatus();
+
+    const startMiles = Number(startMilesEl.value.replace(/[^\d]/g,''));
+    if(!startMiles){
+      showStatus('warn','Ingrese un mileage inicial válido.');
+      return;
+    }
+    if(!contractDateEl.value){
+      showStatus('warn','Seleccione la fecha de inicio del contrato.');
+      return;
+    }
+
+    const contract = new Date(contractDateEl.value+'T00:00:00');
+    if(contract > today){
+      showStatus('bad','La fecha del contrato no puede ser futura.');
+      return;
+    }
+
+    const months = monthsDiff(contract, today);
+    const years = Math.floor(months/12);
+    const remMonths = months%12;
+
+    const addMiles = (years*15000)+(remMonths*1250);
+    const currentMiles = startMiles + addMiles;
+
+    const pre = document.createElement('pre');
+    pre.textContent = `El mileage actual es: ${currentMiles.toLocaleString('en-US')}`;
+    results.appendChild(pre);
+
+    showStatus('ok','DONE');
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calcMileage);
+
+  document.getElementById('clearAllBtn').addEventListener('click',()=>{
+    startMilesEl.value='';
+    contractDateEl.value='';
+    results.innerHTML='';
+    hideStatus();
+  });
+</script>
+</body>
+</html>
