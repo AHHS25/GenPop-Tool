@@ -3,23 +3,53 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GenPop-Tool · Mileage Calculator</title>
+  <title>GenPop-Tool</title>
 
   <style>
     :root{
       --bg:#ffffff;
+      --cardBg:rgba(255,255,255,.9);
+      --panelBg:rgba(255,255,255,.8);
+
       --text:#0f172a;
       --muted:#475569;
       --line:rgba(2,6,23,.10);
-      --purple:#6d28d9;
-      --lilac:#a78bfa;
+
+      --accent:#6d28d9;
+      --accent2:#a78bfa;
+
       --ok:#16a34a;
       --warn:#d97706;
       --bad:#dc2626;
+
       --shadow:0 12px 30px rgba(2,6,23,.10);
       --radius:18px;
       --mono:ui-monospace, Menlo, Consolas, monospace;
       --sans:system-ui, Segoe UI, Roboto, Arial, sans-serif;
+
+      --grad1: rgba(109,40,217,.18);
+      --grad2: rgba(167,139,250,.16);
+
+      --footerText: rgba(109,40,217,.75);
+      --footerLine: rgba(109,40,217,.22);
+    }
+
+    body.dark{
+      --bg:#070A12;
+      --cardBg:rgba(15,23,42,.75);
+      --panelBg:rgba(15,23,42,.60);
+
+      --text:#E5E7EB;
+      --muted:rgba(229,231,235,.70);
+      --line:rgba(255,255,255,.10);
+
+      --shadow:0 12px 30px rgba(0,0,0,.45);
+
+      --grad1: rgba(109,40,217,.28);
+      --grad2: rgba(167,139,250,.20);
+
+      --footerText: rgba(167,139,250,.85);
+      --footerLine: rgba(167,139,250,.22);
     }
 
     *{box-sizing:border-box}
@@ -28,14 +58,15 @@
       margin:0;
       font-family:var(--sans);
       background:
-        radial-gradient(1100px 700px at 20% 10%, rgba(109,40,217,.18), transparent 55%),
-        radial-gradient(900px 650px at 80% 20%, rgba(167,139,250,.16), transparent 60%),
+        radial-gradient(1100px 700px at 20% 10%, var(--grad1), transparent 55%),
+        radial-gradient(900px 650px at 80% 20%, var(--grad2), transparent 60%),
         var(--bg);
       min-height:100vh;
       display:flex;
       justify-content:center;
       padding:28px;
       color:var(--text);
+      transition:.2s;
     }
 
     .wrap{width:min(1100px,100%)}
@@ -43,22 +74,19 @@
     header{
       display:flex;
       justify-content:space-between;
-      gap:14px;
-      margin-bottom:16px;
-      align-items:flex-end;
+      align-items:center;
+      margin-bottom:18px;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    h1{margin:0;font-size:26px; display:flex; align-items:baseline; gap:10px;}
-    .ver{
-      font-size:12px;
-      font-family: var(--mono);
-      color: rgba(15,23,42,.45);
+    .mainTitle{
+      width:100%;
+      text-align:center;
+      font-size:38px;
+      font-weight:900;
       letter-spacing:.6px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid rgba(2,6,23,.10);
-      background: rgba(255,255,255,.55);
-      backdrop-filter: blur(6px);
+      margin:6px 0 14px;
     }
 
     .today{
@@ -67,9 +95,11 @@
       padding:10px 12px;
       border:1px solid var(--line);
       border-radius:12px;
-      background:white;
+      background:rgba(255,255,255,.85);
       box-shadow:var(--shadow);
+      white-space:nowrap;
     }
+    body.dark .today{ background: rgba(15,23,42,.75); }
 
     .btnClear{
       padding:10px 14px;
@@ -80,44 +110,122 @@
       font-family: var(--mono);
       font-size:12px;
       cursor:pointer;
-      color:#3b0764;
+      color:var(--text);
+      transition: transform .15s ease;
+    }
+    .btnClear:hover{transform: translateY(-1px);}
+
+    .switchWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.85);
+      box-shadow:var(--shadow);
+      user-select:none;
+    }
+    body.dark .switchWrap{ background: rgba(15,23,42,.75); }
+
+    .switchLabel{
+      font-family: var(--mono);
+      font-size:12px;
+      color: var(--muted);
     }
 
+    .pill{
+      position:relative;
+      width:92px;
+      height:34px;
+      border-radius:999px;
+      border:1px solid rgba(109,40,217,.30);
+      background:linear-gradient(180deg, rgba(109,40,217,.12), rgba(109,40,217,.05));
+      cursor:pointer;
+      padding:0 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-family:var(--mono);
+      font-size:12px;
+      font-weight:900;
+      outline:none;
+    }
+    body.dark .pill{
+      border-color:rgba(167,139,250,.25);
+      background:linear-gradient(180deg, rgba(167,139,250,.12), rgba(167,139,250,.05));
+    }
+
+    .pill span{ opacity:.55; transition:opacity .15s ease; }
+    .pill.on .lblOn{ opacity:1; }
+    .pill.off .lblOff{ opacity:1; }
+
+    .knob{
+      position:absolute;
+      top:4px;
+      left:4px;
+      width:26px;
+      height:26px;
+      border-radius:999px;
+      background: rgba(255,255,255,.95);
+      transition:transform .18s ease, background .2s ease;
+      box-shadow:0 8px 18px rgba(0,0,0,.15);
+    }
+    body.dark .knob{ background: rgba(255,255,255,.12); }
+
+    .pill.on .knob{ transform:translateX(58px); }
+    .pill.off .knob{ transform:translateX(0px); }
+
     .card{
-      background:rgba(255,255,255,.9);
+      background:var(--cardBg);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       border:1px solid var(--line);
       overflow:hidden;
+      margin-bottom:18px;
     }
 
-    .top{
-      padding:18px;
-      border-bottom:1px solid var(--line);
-    }
+    .top{padding:18px}
 
     .box{
       border:1px dashed rgba(109,40,217,.35);
       border-radius:16px;
       padding:16px;
+      background:var(--panelBg);
       display:flex;
       flex-direction:column;
       gap:12px;
-      background:rgba(255,255,255,.8);
     }
 
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:flex-start;
+    }
 
-    label{font-size:13px;color:var(--muted)}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 220px;
+      flex: 1;
+    }
+
+    label{ font-size:13px; color:var(--muted); }
+
     input{
       padding:12px;
       border-radius:12px;
       border:1px solid var(--line);
       font-family:var(--mono);
-      font-size:14px;
-      background:white;
-      min-width:240px;
+      background:rgba(255,255,255,.92);
+      color:var(--text);
+      width:100%;
+      outline:none;
     }
+    body.dark input{ background: rgba(2,6,23,.35); }
 
     .btn{
       padding:12px 14px;
@@ -127,6 +235,8 @@
       font-weight:800;
       cursor:pointer;
       font-family:var(--mono);
+      color:var(--text);
+      min-width:120px;
     }
 
     .status{
@@ -136,24 +246,26 @@
       font-family:var(--mono);
       font-size:13px;
       border:1px solid;
-      background:white;
+      background:rgba(255,255,255,.92);
     }
+    body.dark .status{ background: rgba(15,23,42,.75); }
+
     .status.ok{border-color:var(--ok); color:#065f46;}
     .status.warn{border-color:var(--warn); color:#92400e;}
     .status.bad{border-color:var(--bad); color:#7f1d1d;}
-
-    .results{padding:18px}
 
     pre{
       padding:16px;
       border-radius:16px;
       border:1px solid var(--line);
-      background:white;
+      background:rgba(255,255,255,.92);
       font-family:var(--mono);
-      font-size:15px;
-      font-weight:700;
-      text-align:center;
+      font-size:13px;
+      white-space:pre-wrap;
+      line-height:1.35;
+      margin:0;
     }
+    body.dark pre{ background: rgba(15,23,42,.75); }
 
     .footer{
       margin-top: 22px;
@@ -161,8 +273,8 @@
       text-align: center;
       font-family: var(--mono);
       font-size: 12px;
-      color: rgba(109,40,217,.75);
-      border-top: 1px solid rgba(109,40,217,.22);
+      color: var(--footerText);
+      border-top: 1px solid var(--footerLine);
     }
   </style>
 </head>
@@ -171,40 +283,100 @@
 <div class="wrap">
 
   <header>
-    <div>
-      <h1>GenPop-Tool <span class="ver">1.0
-      </span></h1>
+    <div class="switchWrap" title="ON = Light · OFF = Dark">
+      <div class="switchLabel">Mode</div>
+
+      <div class="pill on" id="themeSwitch" role="switch" aria-checked="true" tabindex="0">
+        <span class="lblOff">OFF</span>
+        <span class="lblOn">ON</span>
+        <i class="knob" aria-hidden="true"></i>
+      </div>
     </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-      <div class="today" id="todayBox"></div>
-      <button class="btnClear" id="clearAllBtn">🧹 Clear All</button>
-    </div>
+
+    <div class="today" id="todayBox"></div>
+    <button class="btnClear" id="clearAllBtn">🧹 Clear All</button>
   </header>
 
+  <div class="mainTitle" id="mainTitle">Acct Reposession</div>
+
+  <!-- ✅ MILEAGE CALCULATOR -->
   <section class="card">
     <div class="top">
       <div class="box">
         <strong>Mileage Calculator</strong>
 
         <div class="row">
-          <div>
-            <label>Starting mileage (at contract)</label><br/>
+          <div class="field">
+            <label>Starting mileage (at contract)</label>
             <input id="startMiles" placeholder="Ej: 42350" />
           </div>
 
-          <div>
-            <label>Contract date (MM/DD/YYYY)</label><br/>
+          <div class="field">
+            <label>Contract date (MM/DD/YYYY)</label>
             <input id="contractDate" type="date" />
           </div>
 
           <button class="btn" id="calcBtn">Calculate</button>
         </div>
 
-        <div class="status" id="statusBox"></div>
+        <pre id="mileageResult">El mileage actual es: —</pre>
+        <div class="status" id="mileageStatus"></div>
       </div>
     </div>
+  </section>
 
-    <div class="results" id="results"></div>
+  <!-- ✅ REPO SECTION -->
+  <section class="card">
+    <div class="top">
+      <div class="box">
+
+        <!-- LIGHT -->
+        <div id="lightForm">
+          <div class="row">
+            <div class="field">
+              <label>MMR</label>
+              <input id="mmrLight" placeholder="Ej: 12000" />
+            </div>
+
+            <div class="field">
+              <label>Current Balance</label>
+              <input id="balLight" placeholder="Ej: 18500" />
+            </div>
+
+            <div class="field">
+              <label>Repo Fees</label>
+              <input id="feesLight" placeholder="Ej: 950" />
+            </div>
+
+            <button class="btn" id="enterLightBtn">Enter</button>
+          </div>
+        </div>
+
+        <!-- DARK (NO CAMBIOS) -->
+        <div id="darkForm" style="display:none;">
+          <div class="row">
+            <div class="field">
+              <label>MMR</label>
+              <input id="mmrDark" placeholder="Ej: 12000" />
+            </div>
+
+            <div class="field">
+              <label>Current Balance</label>
+              <input id="balDark" placeholder="Ej: 18500" />
+            </div>
+
+            <button class="btn" id="enterDarkBtn">Enter</button>
+          </div>
+        </div>
+
+        <div class="status ok" id="statusBox">✅ Settlement done</div>
+
+        <div id="settlementOutWrap" style="display:none;">
+          <pre id="settlementOut"></pre>
+        </div>
+
+      </div>
+    </div>
   </section>
 
   <footer class="footer">
@@ -214,70 +386,473 @@
 </div>
 
 <script>
+  // =========================
+  // TODAY + FOOTER YEAR
+  // =========================
   const today = new Date();
   document.getElementById('todayBox').textContent =
     `Today: ${today.getMonth()+1}/${today.getDate()}/${today.getFullYear()}`;
   document.getElementById('year').textContent = today.getFullYear();
 
-  const startMilesEl = document.getElementById('startMiles');
-  const contractDateEl = document.getElementById('contractDate');
-  const results = document.getElementById('results');
-  const statusBox = document.getElementById('statusBox');
+  // =========================
+  // HELPERS
+  // =========================
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function fmtDate(d){ return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}/${d.getFullYear()}`; }
 
-  function showStatus(type,msg){
+  function parseNumber(v){
+    const cleaned = String(v || '').trim().replace(/[$,]/g,'').replace(/[^\d.]/g,'');
+    if(!cleaned) return 0;
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : 0;
+  }
+  function parseCents(v){
+    const n = parseNumber(v);
+    if(n <= 0) return 0;
+    return Math.round(n * 100);
+  }
+  function money(cents){
+    return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD' }).format((cents||0)/100);
+  }
+
+  function buildInstallments(totalCents, n){
+    const base = Math.floor(totalCents / n);
+    let rem = totalCents - base * n;
+    const pays = [];
+    for(let i=0;i<n;i++){
+      const extra = rem > 0 ? 1 : 0;
+      pays.push(base + extra);
+      rem -= extra;
+    }
+    return pays;
+  }
+
+  function addMonthsKeepDay(date, monthsToAdd){
+    const y = date.getFullYear();
+    const m = date.getMonth();
+    const day = date.getDate();
+    const targetMonth = m + monthsToAdd;
+    const newY = y + Math.floor(targetMonth / 12);
+    const newM = ((targetMonth % 12) + 12) % 12;
+    const dim = new Date(newY, newM + 1, 0).getDate();
+    const newD = Math.min(day, dim);
+    return new Date(newY, newM, newD);
+  }
+
+  function parseMMDDYYYY(s){
+    const m = String(s||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if(!m) return null;
+    const mm = Number(m[1]) - 1;
+    const dd = Number(m[2]);
+    const yy = Number(m[3]);
+    const d = new Date(yy, mm, dd);
+    if(d.getFullYear() !== yy || d.getMonth() !== mm || d.getDate() !== dd) return null;
+    return d;
+  }
+
+  // =========================
+  // UI: status + settlement text
+  // =========================
+  const themeSwitch = document.getElementById('themeSwitch');
+  const mainTitle = document.getElementById('mainTitle');
+  const lightForm = document.getElementById('lightForm');
+  const darkForm = document.getElementById('darkForm');
+  const statusBox = document.getElementById('statusBox');
+  const settlementOutWrap = document.getElementById('settlementOutWrap');
+  const settlementOut = document.getElementById('settlementOut');
+
+  const STORAGE_KEY = 'genpop_theme';
+
+  function showStatus(type, msg){
     statusBox.className = `status ${type}`;
     statusBox.style.display = 'block';
     statusBox.textContent = msg;
   }
-  function hideStatus(){ statusBox.style.display='none'; }
+  function hideStatus(){
+    statusBox.style.display = 'none';
+    statusBox.textContent = '';
+  }
+  function showSettlementText(text){
+    settlementOut.textContent = text;
+    settlementOutWrap.style.display = 'block';
+  }
+  function hideSettlementText(){
+    settlementOut.textContent = '';
+    settlementOutWrap.style.display = 'none';
+  }
+
+  function applyTheme(mode){
+    if(mode === 'dark'){
+      document.body.classList.add('dark');
+      themeSwitch.classList.remove('on');
+      themeSwitch.classList.add('off');
+      themeSwitch.setAttribute('aria-checked','false');
+
+      mainTitle.textContent = 'Acct Repo Open Assignment';
+      darkForm.style.display = 'block';
+      lightForm.style.display = 'none';
+    } else {
+      document.body.classList.remove('dark');
+      themeSwitch.classList.remove('off');
+      themeSwitch.classList.add('on');
+      themeSwitch.setAttribute('aria-checked','true');
+
+      mainTitle.textContent = 'Acct Reposession';
+      lightForm.style.display = 'block';
+      darkForm.style.display = 'none';
+    }
+
+    hideStatus();
+    try{ localStorage.setItem(STORAGE_KEY, mode); }catch(e){}
+  }
+
+  function toggleTheme(){
+    const isDark = document.body.classList.contains('dark');
+    applyTheme(isDark ? 'light' : 'dark');
+  }
+
+  (function initTheme(){
+    let saved = null;
+    try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
+  })();
+
+  themeSwitch.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleTheme();
+  });
+  themeSwitch.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggleTheme();
+    }
+  });
+
+  // =========================
+  // MILEAGE CALCULATOR (GATE)
+  // =========================
+  const startMilesEl = document.getElementById('startMiles');
+  const contractDateEl = document.getElementById('contractDate');
+  const mileageResult = document.getElementById('mileageResult');
+  const mileageStatus = document.getElementById('mileageStatus');
+
+  let mileageCalculated = false;
+  let lastMileageValue = null;
+
+  function showMileageStatus(type, msg){
+    mileageStatus.className = `status ${type}`;
+    mileageStatus.style.display = 'block';
+    mileageStatus.textContent = msg;
+  }
+  function hideMileageStatus(){
+    mileageStatus.style.display = 'none';
+    mileageStatus.textContent = '';
+  }
 
   function monthsDiff(start, end){
-    let months = (end.getFullYear()-start.getFullYear())*12 +
-                 (end.getMonth()-start.getMonth());
+    let months = (end.getFullYear()-start.getFullYear())*12 + (end.getMonth()-start.getMonth());
     if(end.getDate() < start.getDate()) months--;
     return months;
   }
 
-  function calcMileage(){
-    results.innerHTML='';
-    hideStatus();
-
-    const startMiles = Number(startMilesEl.value.replace(/[^\d]/g,''));
-    if(!startMiles){
-      showStatus('warn','Ingrese un mileage inicial válido.');
-      return;
-    }
-    if(!contractDateEl.value){
-      showStatus('warn','Seleccione la fecha de inicio del contrato.');
-      return;
-    }
+  function calcMileageValue(){
+    const startMiles = Number(String(startMilesEl.value || '').replace(/[^\d]/g,''));
+    if(!startMiles) return null;
+    if(!contractDateEl.value) return null;
 
     const contract = new Date(contractDateEl.value+'T00:00:00');
-    if(contract > today){
-      showStatus('bad','La fecha del contrato no puede ser futura.');
-      return;
-    }
+    if(contract > today) return null;
 
     const months = monthsDiff(contract, today);
     const years = Math.floor(months/12);
     const remMonths = months%12;
 
-    const addMiles = (years*15000)+(remMonths*1250);
-    const currentMiles = startMiles + addMiles;
+    const addMiles = (years*15000) + (remMonths*1250);
+    return startMiles + addMiles;
+  }
 
-    const pre = document.createElement('pre');
-    pre.textContent = `El mileage actual es: ${currentMiles.toLocaleString('en-US')}`;
-    results.appendChild(pre);
+  function calcMileage(){
+    hideMileageStatus();
 
-    showStatus('ok','DONE');
+    const currentMiles = calcMileageValue();
+    if(currentMiles === null){
+      mileageCalculated = false;
+      lastMileageValue = null;
+
+      if(!String(startMilesEl.value||'').trim()){
+        showMileageStatus('warn','Ingrese un mileage inicial válido.');
+      } else if(!contractDateEl.value){
+        showMileageStatus('warn','Seleccione la fecha de inicio del contrato.');
+      } else {
+        showMileageStatus('bad','La fecha del contrato no puede ser futura.');
+      }
+      mileageResult.textContent = 'El mileage actual es: —';
+      return;
+    }
+
+    mileageCalculated = true;
+    lastMileageValue = currentMiles;
+
+    mileageResult.textContent = `El mileage actual es: ${currentMiles.toLocaleString('en-US')}`;
+    showMileageStatus('ok','Cálculo realizado correctamente.');
   }
 
   document.getElementById('calcBtn').addEventListener('click', calcMileage);
 
-  document.getElementById('clearAllBtn').addEventListener('click',()=>{
-    startMilesEl.value='';
-    contractDateEl.value='';
-    results.innerHTML='';
+  function requireMileageFirst(){
+    if(!mileageCalculated){
+      showStatus('warn', '⚠️ Primero calcula el mileage para poder proseguir.');
+      return false;
+    }
+    return true;
+  }
+
+  function invalidateMileage(){
+    mileageCalculated = false;
+    lastMileageValue = null;
+  }
+  startMilesEl.addEventListener('input', invalidateMileage);
+  contractDateEl.addEventListener('change', invalidateMileage);
+
+  // =========================
+  // SETTLEMENT GENERATION
+  // - DARK (Acct Repo Open Assignment) = NO CAMBIOS (como estaba)
+  // - LIGHT (Acct Reposession) = CAMBIOS pedidos
+  // =========================
+  const REINS_DATE = '12/22/2025';
+  const REINS_DATE_OBJ = parseMMDDYYYY(REINS_DATE) || new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  function buildStandardBlock({
+    optionTitle,
+    balanceCents,
+    pctLabel,          // string e.g. "70.00" | "50.00" | "100.00"
+    settlementCents,
+    mmrCents,
+    mileageText,
+    feesCents,
+    lines,
+    includeFeesLine
+  }){
+    const feesLine = includeFeesLine ? `Repo fees: ${money(feesCents)}\n` : '';
+    return (
+`***SETTLEMENT BREAKDOWN (${optionTitle})***
+Current Balance: ${money(balanceCents)}
+Settlement percentage: ${pctLabel}%
+Settlement amount: ${money(settlementCents)}
+MMR: ${money(mmrCents)}
+Mileage: ${mileageText}
+${feesLine}Number of installments: ${lines.length}
+${lines.join('\n')}`
+    ).replace(/\n\n+/g,'\n');
+  }
+
+  // ✅ LIGHT (Acct Reposession) - NEW RULES
+  //
+  // If MMR > 50% of balance:
+  //   - FULL BALANCE option (first payment covers MMR) + "Reins. : date amount"
+  //   - 50% option (first payment covers MMR) + "Reins..."
+  //
+  // If MMR < 50% of balance:
+  //   - FULL BALANCE option (first payment covers MMR) + "Reins..."
+  //   - 70% option (first payment covers MMR) + "Reins..."
+  //   - 50% option (first payment covers MMR) + "Reins..."
+  //
+  // Repo fees:
+  //   - must be added to settlement amount
+  //   - and added to FIRST installment
+  function generateReposessionSettlement_LIGHT(){
+    if(!requireMileageFirst()) return;
+
+    const mmrCents = parseCents(document.getElementById('mmrLight').value);
+    const balCents = parseCents(document.getElementById('balLight').value);
+    const feesCents = parseCents(document.getElementById('feesLight').value);
+
+    if(!mmrCents || !balCents){
+      showStatus('warn', 'ℹ️ Please enter MMR and Current Balance first.');
+      return;
+    }
+
+    const mileageText = (lastMileageValue == null) ? '—' : lastMileageValue.toLocaleString('en-US');
+    const target50 = Math.round(balCents * 0.50);
+
+    function makePlan(pct){ // pct: 1.00, 0.70, 0.50
+      const pctLabel = (pct * 100).toFixed(2);
+
+      // Base target (without fees) for % plans, but NEVER below MMR
+      let baseTarget = (pct === 1.00) ? balCents : Math.round(balCents * pct);
+      baseTarget = Math.max(baseTarget, mmrCents); // ensure first covers MMR without breaking plan
+
+      // Total settlement includes fees
+      const settlementCents = baseTarget + feesCents;
+
+      // First installment: MMR + fees, labeled as Reins on REINS_DATE
+      const firstInstall = mmrCents + feesCents;
+
+      // Remaining to pay after first installment
+      const remaining = Math.max(0, settlementCents - firstInstall);
+
+      // Split remaining into next 3 months
+      const nextPays = buildInstallments(remaining, 3);
+
+      const lines = [];
+      lines.push(`Reins. : ${REINS_DATE} ${money(firstInstall)}`);
+      for(let i=0;i<3;i++){
+        const due = addMonthsKeepDay(REINS_DATE_OBJ, i+1);
+        lines.push(`${fmtDate(due)} ${money(nextPays[i])}`);
+      }
+
+      // If remaining is 0, still keep 4 lines? You asked “primera mensualidad… y el monto…”
+      // We keep the 3 additional lines even if $0.00 so agents can copy/paste consistently.
+      return buildStandardBlock({
+        optionTitle: (pct === 1.00) ? 'FULL BALANCE' : `${pctLabel}%`,
+        balanceCents: balCents,
+        pctLabel: (pct === 1.00) ? '100.00' : pctLabel,
+        settlementCents,
+        mmrCents,
+        mileageText,
+        feesCents,
+        lines,
+        includeFeesLine: true
+      });
+    }
+
+    const blocks = [];
+    // Always FULL BALANCE
+    blocks.push(makePlan(1.00));
+
+    if(mmrCents > target50){
+      // only 50% (plus full balance)
+      blocks.push(makePlan(0.50));
+    } else {
+      // 70% + 50% (plus full balance)
+      blocks.push(makePlan(0.70));
+      blocks.push(makePlan(0.50));
+    }
+
+    showSettlementText(blocks.join('\n\n'));
+    showStatus('ok', '✅ Settlement done');
+  }
+
+  // ✅ DARK (Acct Repo Open Assignment) - leave EXACTLY as it was in your last version
+  function generateRepoOpenAssignment_DARK(){
+    if(!requireMileageFirst()) return;
+
+    const mmrCents = parseCents(document.getElementById('mmrDark').value);
+    const balCents = parseCents(document.getElementById('balDark').value);
+
+    if(!mmrCents || !balCents){
+      showStatus('warn', 'ℹ️ Please enter MMR and Current Balance first.');
+      return;
+    }
+
+    const mileageText = (lastMileageValue == null) ? '—' : lastMileageValue.toLocaleString('en-US');
+    const target50 = Math.round(balCents * 0.50);
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    // Option 1: 30% discount (70%) FIRST when MMR < 50%
+    let opt70 = '';
+    if(mmrCents < target50){
+      const total70 = Math.round(balCents * 0.70);
+      const remaining = Math.max(0, total70 - mmrCents);
+      const pays = buildInstallments(remaining, 3);
+      const installments = [mmrCents, ...pays];
+
+      const lines = [];
+      for(let i=0;i<installments.length;i++){
+        const due = addMonthsKeepDay(start, i);
+        lines.push(`${fmtDate(due)} ${money(installments[i])}`);
+      }
+
+      opt70 =
+`***SETTLEMENT BREAKDOWN (OPTION 1 - LIQUIDATE 30% DISCOUNT)***
+Current Balance: ${money(balCents)}
+Settlement percentage: 70.00%
+Settlement amount: ${money(total70)}
+MMR: ${money(mmrCents)}
+Mileage: ${mileageText}
+Number of installments: 4
+${lines.join('\n')}`;
+    }
+
+    // Option 2: to 50% (MMR first + 3 months) only if MMR <= 50%
+    let opt50 = '';
+    if(mmrCents <= target50){
+      const remainingTo50 = Math.max(0, target50 - mmrCents);
+      const pays = buildInstallments(remainingTo50, 3);
+      const installments = [mmrCents, ...pays];
+
+      const lines = [];
+      for(let i=0;i<installments.length;i++){
+        const due = addMonthsKeepDay(start, i);
+        lines.push(`${fmtDate(due)} ${money(installments[i])}`);
+      }
+
+      opt50 =
+`***SETTLEMENT BREAKDOWN (OPTION 2 - TO 50%)***
+Current Balance: ${money(balCents)}
+Settlement percentage: 50.00%
+Settlement amount: ${money(target50)}
+MMR: ${money(mmrCents)}
+Mileage: ${mileageText}
+Number of installments: 4
+${lines.join('\n')}`;
+    }
+
+    // Option 3: If MMR > 50% => liquidate 100% (MMR first + 3 months)
+    let opt100 = '';
+    if(mmrCents > target50){
+      const remainingTo100 = Math.max(0, balCents - mmrCents);
+      const pays = buildInstallments(remainingTo100, 3);
+      const installments = [mmrCents, ...pays];
+
+      const lines = [];
+      for(let i=0;i<installments.length;i++){
+        const due = addMonthsKeepDay(start, i);
+        lines.push(`${fmtDate(due)} ${money(installments[i])}`);
+      }
+
+      opt100 =
+`***SETTLEMENT BREAKDOWN (OPTION 3 - LIQUIDATE 100%)***
+Current Balance: ${money(balCents)}
+Settlement percentage: 100.00%
+Settlement amount: ${money(balCents)}
+MMR: ${money(mmrCents)}
+Mileage: ${mileageText}
+Number of installments: 4
+${lines.join('\n')}`;
+    }
+
+    const blocks = [opt70, opt50, opt100].filter(Boolean);
+    showSettlementText(blocks.join('\n\n'));
+    showStatus('ok', '✅ Settlement done');
+  }
+
+  // Buttons
+  document.getElementById('enterLightBtn').addEventListener('click', generateReposessionSettlement_LIGHT);
+  document.getElementById('enterDarkBtn').addEventListener('click', generateRepoOpenAssignment_DARK);
+
+  // =========================
+  // CLEAR ALL
+  // =========================
+  document.getElementById('clearAllBtn').addEventListener('click', () => {
+    // mileage
+    startMilesEl.value = '';
+    contractDateEl.value = '';
+    mileageResult.textContent = 'El mileage actual es: —';
+    hideMileageStatus();
+    invalidateMileage();
+
+    // repo light
+    document.getElementById('mmrLight').value = '';
+    document.getElementById('balLight').value = '';
+    document.getElementById('feesLight').value = '';
+
+    // repo dark
+    document.getElementById('mmrDark').value = '';
+    document.getElementById('balDark').value = '';
+
+    hideSettlementText();
     hideStatus();
   });
 </script>
