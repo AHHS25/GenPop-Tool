@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -308,7 +308,7 @@
         <div class="row">
           <div class="field">
             <label>Starting mileage (at contract)</label>
-            <input id="startMiles" placeholder="Ej: 42350" />
+            <input id="startMiles" placeholder="Ex: 42350" />
           </div>
 
           <div class="field">
@@ -320,7 +320,7 @@
           <button class="btn" id="calcBtn">Calculate</button>
         </div>
 
-        <pre id="mileageResult">El mileage actual es: —</pre>
+        <pre id="mileageResult">The current mileage is: —</pre>
         <div class="status" id="mileageStatus"></div>
       </div>
     </div>
@@ -336,34 +336,34 @@
           <div class="row">
             <div class="field">
               <label>MMR</label>
-              <input id="mmrLight" placeholder="Ej: 12000" />
+              <input id="mmrLight" placeholder="Ex: 12000" />
             </div>
 
             <div class="field">
               <label>Current Balance</label>
-              <input id="balLight" placeholder="Ej: 18500" />
+              <input id="balLight" placeholder="Ex: 18500" />
             </div>
 
             <div class="field">
               <label>Repo Fees</label>
-              <input id="feesLight" placeholder="Ej: 950" />
+              <input id="feesLight" placeholder="Ex: 950" />
             </div>
 
             <button class="btn" id="enterLightBtn">Enter</button>
           </div>
         </div>
 
-        <!-- DARK (NO CAMBIOS) -->
+        <!-- DARK (NO CHANGES) -->
         <div id="darkForm" style="display:none;">
           <div class="row">
             <div class="field">
               <label>MMR</label>
-              <input id="mmrDark" placeholder="Ej: 12000" />
+              <input id="mmrDark" placeholder="Ex: 12000" />
             </div>
 
             <div class="field">
               <label>Current Balance</label>
-              <input id="balDark" placeholder="Ej: 18500" />
+              <input id="balDark" placeholder="Ex: 18500" />
             </div>
 
             <button class="btn" id="enterDarkBtn">Enter</button>
@@ -604,28 +604,28 @@
       lastMileageValue = null;
 
       if(!String(startMilesEl.value||'').trim()){
-        showMileageStatus('warn','Ingrese un mileage inicial válido.');
+        showMileageStatus('warn','Enter a valid starting mileage.');
       } else if(!String(contractDateEl.value||'').trim()){
-        showMileageStatus('warn','Pegue o escriba la fecha del contrato (MM/DD/YYYY).');
+        showMileageStatus('warn','Paste or type the contract date (MM/DD/YYYY).');
       } else {
-        showMileageStatus('bad','Fecha inválida. Use MM/DD/YYYY (o pegue YYYY-MM-DD).');
+        showMileageStatus('bad','Invalid date. Use MM/DD/YYYY (or paste the contract date directly).');
       }
-      mileageResult.textContent = 'El mileage actual es: —';
+      mileageResult.textContent = 'The current mileage is: —';
       return;
     }
 
     mileageCalculated = true;
     lastMileageValue = currentMiles;
 
-    mileageResult.textContent = `El mileage actual es: ${currentMiles.toLocaleString('en-US')}`;
-    showMileageStatus('ok','Cálculo realizado correctamente.');
+    mileageResult.textContent = `The current mileage is: ${currentMiles.toLocaleString('en-US')}`;
+    showMileageStatus('ok','Calculation completed successfully.');
   }
 
   document.getElementById('calcBtn').addEventListener('click', calcMileage);
 
   function requireMileageFirst(){
     if(!mileageCalculated){
-      showStatus('warn', '⚠️ Primero calcula el mileage para poder proseguir.');
+      showStatus('warn', '⚠️ Please calculate the mileage first to continue.');
       return false;
     }
     return true;
@@ -840,7 +840,7 @@ ${lines.join('\n')}`;
     // mileage
     startMilesEl.value = '';
     contractDateEl.value = '';
-    mileageResult.textContent = 'El mileage actual es: —';
+    mileageResult.textContent = 'The current mileage is: —';
     hideMileageStatus();
     invalidateMileage();
 
